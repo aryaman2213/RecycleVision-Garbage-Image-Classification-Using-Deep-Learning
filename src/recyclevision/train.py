@@ -89,7 +89,7 @@ def export_float32(trained: keras.Model, name: str, path) -> None:
         keras.mixed_precision.set_global_policy(policy)
 
 
-def train_model(name: str, frozen_epochs: int = 8, finetune_epochs: int = 15, baseline_epochs: int = 40) -> dict:
+def train_model(name: str, frozen_epochs: int = 8, finetune_epochs: int = 15, baseline_epochs: int = 25) -> dict:
     C.MODELS_DIR.mkdir(parents=True, exist_ok=True)
     C.METRICS_DIR.mkdir(parents=True, exist_ok=True)
     keras.utils.set_random_seed(C.SEED)

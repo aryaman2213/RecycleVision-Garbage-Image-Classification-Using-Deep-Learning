@@ -2,14 +2,14 @@
 
 Run locally:  streamlit run app/streamlit_app.py
 """
-import json
 import sys
 import time
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import streamlit as st
-from PIL import Image, UnidentifiedImageError
+from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -20,21 +20,49 @@ from recyclevision import inference as I  # noqa: E402
 st.set_page_config(page_title="RecycleVision", page_icon="♻️", layout="wide")
 
 EXAMPLES_DIR = ROOT / "app" / "examples"
-LOW_CONFIDENCE = 0.55  # below this the app says it is unsure instead of asserting a class
+MODEL_LABELS = {"baseline_cnn": "Baseline CNN", "mobilenetv2": "MobileNetV2",
+                "efficientnetb0": "EfficientNetB0", "resnet50": "ResNet50"}
 
 
-@st.cache_resource(show_spinner="Loading model ...")
+@st.cache_resource(show_spinner="Loading the model (first visit only) ...")
 def get_model():
-    return I.load_best()
+    model, meta = I.load_best()
+    I.gradcam(model, Image.new("RGB", (C.IMG_SIZE, C.IMG_SIZE)))  # compile Grad-CAM once, up front
+    return model, meta
 
 
 @st.cache_data
-def comparison_table():
+def comparison_table() -> pd.DataFrame | None:
     p = C.METRICS_DIR / "model_comparison.csv"
-    return pd.read_csv(p) if p.exists() else None
+    if not p.exists():
+        return None
+    t = pd.read_csv(p)
+    out = pd.DataFrame({
+        "Model": t["model"].map(MODEL_LABELS).fillna(t["model"]),
+        "Test accuracy": t["accuracy"] * 100,
+        "Precision": t["precision_macro"],
+        "Recall": t["recall_macro"],
+        "Macro-F1": t["f1_macro"],
+        "Top-3 accuracy": t["top3_accuracy"] * 100,
+        "Size (MB)": t["size_mb"],
+        "Parameters (M)": t["params_m"],
+    })
+    if "latency_ms_single" in t:
+        out["CPU ms / image"] = t["latency_ms_single"]
+    return out
 
 
-def classify(image: Image.Image, show_cam: bool):
+def load_upload(upload) -> Image.Image | None:
+    try:
+        image = Image.open(upload)
+        image.load()
+        return I.to_rgb(image)  # upright (EXIF) and RGB, exactly what the model sees
+    except Exception:  # noqa: BLE001 - corrupt, truncated, oversized or unsupported files
+        st.error("That file could not be read as an image. Please upload a JPG, PNG, WEBP or BMP photo.")
+        return None
+
+
+def classify(image: Image.Image, show_cam: bool) -> None:
     model, meta = get_model()
     t0 = time.perf_counter()
     top = I.predict(model, image, top_k=3)
@@ -44,26 +72,28 @@ def classify(image: Image.Image, show_cam: bool):
 
     left, right = st.columns([1, 1.25], gap="large")
     with left:
-        st.image(image, caption="Your image", use_container_width=True)
+        st.image(image, caption="Your image", width="stretch")
         if show_cam:
-            with st.spinner("Computing Grad-CAM ..."):
-                cam = I.gradcam(model, image)
-            st.image(I.overlay(image, cam), caption="Grad-CAM: red = regions that drove the prediction",
-                     use_container_width=True)
+            cam = I.gradcam(model, image)
+            st.image(I.overlay(image, cam), width="stretch",
+                     caption="Grad-CAM: red = regions that drove the prediction")
     with right:
-        if conf >= LOW_CONFIDENCE:
-            st.success(f"### {label.capitalize()}  ·  {conf:.1%} confident")
+        if conf >= C.CONFIDENCE_THRESHOLD:
+            st.success(f"### {label.capitalize()} · {conf:.1%} confident")
+            st.markdown(f"**Disposal stream:** {stream}  \n{tip}")
         else:
-            st.warning(f"### Not sure - maybe {label} ({conf:.1%})\n"
+            st.warning(f"### Not sure - maybe {label} ({conf:.1%})\n\n"
                        "Try a closer photo of a single item on a plain background.")
-        st.markdown(f"**Disposal stream:** {stream}  \n{tip}")
+            st.markdown(f"**If it is {label}:** {stream} - {tip}")
+        if label == "battery" and conf >= C.CONFIDENCE_THRESHOLD:
+            st.error("Hazardous waste: batteries can start fires in collection trucks. Never put them in household bins.")
         st.markdown("#### Top-3 predictions")
         for name, p in top:
-            st.progress(min(max(p, 0.0), 1.0), text=f"{name} - {p:.1%}")
-        st.caption(f"Model: {meta['model']} · inference {ms:.0f} ms on this server")
+            st.progress(float(np.clip(p, 0.0, 1.0)), text=f"{name} - {p:.1%}")
+        st.caption(f"Model: {MODEL_LABELS.get(meta['model'], meta['model'])} · prediction took {ms:.0f} ms")
 
 
-def main():
+def main() -> None:
     st.title("♻️ RecycleVision")
     st.write("Upload a photo of a single waste item. The model sorts it into one of 10 categories: "
              + ", ".join(C.CLASSES) + ".")
@@ -76,30 +106,28 @@ def main():
 
     with st.sidebar:
         st.header("About the model")
-        st.markdown(f"**{meta['model']}** - selected by {meta['selected_by']}.  \n"
+        st.markdown(f"**{MODEL_LABELS.get(meta['model'], meta['model'])}**, selected by {meta['selected_by']}.  \n"
                     f"Test accuracy **{meta['test_accuracy']:.1%}**, macro-F1 **{meta['test_f1_macro']:.3f}** "
-                    "on 2,423 held-out images.")
-        show_cam = st.toggle("Show Grad-CAM explanation", value=True)
+                    f"on {meta['n_test_images']:,} held-out images.")
+        show_cam = st.toggle("Show Grad-CAM explanation", value=True,
+                             help="Heatmap of the image regions the model relied on.")
         st.divider()
-        st.markdown("Trained on 16,153 unique images merged from three Kaggle datasets "
+        st.markdown(f"Trained on {meta['n_dataset_images']:,} unique images merged from three Kaggle datasets "
                     "(duplicates removed across sources).")
+        st.caption("Works best on one item per photo. Low-confidence results are flagged as unsure.")
 
     tab_classify, tab_models = st.tabs(["Classify", "Model comparison"])
     with tab_classify:
         upload = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png", "webp", "bmp"])
-        examples = sorted(EXAMPLES_DIR.glob("*.jpg")) if EXAMPLES_DIR.exists() else []
-        choice = None
-        if examples and upload is None:
-            choice = st.selectbox("...or try an example", ["-"] + [p.stem for p in examples])
+        examples = sorted(p.stem for p in EXAMPLES_DIR.glob("*.jpg")) if EXAMPLES_DIR.exists() else []
         image = None
         if upload is not None:
-            try:
-                image = Image.open(upload)
-                image.load()
-            except (UnidentifiedImageError, OSError):
-                st.error("That file is not a readable image.")
-        elif choice and choice != "-":
-            image = Image.open(EXAMPLES_DIR / f"{choice}.jpg")
+            image = load_upload(upload)
+        elif examples:
+            choice = st.selectbox("...or try an example from the held-out test set", examples,
+                                  index=None, placeholder="Choose an example")
+            if choice:
+                image = I.to_rgb(Image.open(EXAMPLES_DIR / f"{choice}.jpg"))
         if image is not None:
             classify(image, show_cam)
 
@@ -108,12 +136,25 @@ def main():
         if table is None:
             st.info("Run scripts/evaluate_models.py to generate the comparison.")
         else:
-            cols = ["model", "accuracy", "precision_macro", "recall_macro", "f1_macro", "top3_accuracy",
-                    "size_mb", "params_m", "latency_ms_single"]
-            st.dataframe(table[[c for c in cols if c in table]].round(4), hide_index=True, use_container_width=True)
-            for fig in ["model_comparison.png", f"confusion_{meta['model']}.png"]:
+            st.markdown(f"All models evaluated on the same {meta['n_test_images']:,} held-out test images. "
+                        f"**{MODEL_LABELS.get(meta['model'], meta['model'])}** has the highest validation macro-F1 "
+                        "and is the one deployed here.")
+            st.dataframe(
+                table, hide_index=True, width="stretch",
+                column_config={
+                    "Test accuracy": st.column_config.NumberColumn(format="%.1f%%"),
+                    "Top-3 accuracy": st.column_config.NumberColumn(format="%.1f%%"),
+                    "Precision": st.column_config.NumberColumn(format="%.3f"),
+                    "Recall": st.column_config.NumberColumn(format="%.3f"),
+                    "Macro-F1": st.column_config.NumberColumn(format="%.3f"),
+                    "Size (MB)": st.column_config.NumberColumn(format="%.0f"),
+                    "Parameters (M)": st.column_config.NumberColumn(format="%.1f"),
+                    "CPU ms / image": st.column_config.NumberColumn(format="%.0f"),
+                })
+            for fig, caption in [("model_comparison.png", "Test-set metrics per model (dashed line: 85% target)"),
+                                 (f"confusion_{meta['model']}.png", "Confusion matrix of the deployed model")]:
                 if (C.FIGURES_DIR / fig).exists():
-                    st.image(str(C.FIGURES_DIR / fig), use_container_width=True)
+                    st.image(str(C.FIGURES_DIR / fig), caption=caption, width="stretch")
 
 
 main()

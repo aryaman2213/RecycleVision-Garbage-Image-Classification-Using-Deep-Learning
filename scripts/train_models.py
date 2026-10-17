@@ -2,6 +2,8 @@
 
 Usage:  python scripts/train_models.py [--models baseline_cnn mobilenetv2 ...] [--retrain]
 Models already saved in models/ are skipped, so an interrupted Colab run can simply be restarted.
+Defaults reproduce the reported run: transfer models first (8 frozen + up to 15 fine-tune epochs), then the
+baseline CNN (25 epochs).
 """
 import argparse
 import sys
@@ -17,11 +19,11 @@ from recyclevision.train import train_model  # noqa: E402
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--models", nargs="+", default=C.MODEL_NAMES, choices=C.MODEL_NAMES)
+    ap.add_argument("--models", nargs="+", default=C.TRAIN_ORDER, choices=C.MODEL_NAMES)
     ap.add_argument("--retrain", action="store_true")
     ap.add_argument("--frozen-epochs", type=int, default=8)
     ap.add_argument("--finetune-epochs", type=int, default=15)
-    ap.add_argument("--baseline-epochs", type=int, default=40)
+    ap.add_argument("--baseline-epochs", type=int, default=25)
     a = ap.parse_args()
     if tf.config.list_physical_devices("GPU"):
         keras.mixed_precision.set_global_policy("mixed_float16")  # ~2x faster on T4 tensor cores

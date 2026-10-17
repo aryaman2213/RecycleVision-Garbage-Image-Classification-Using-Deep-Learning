@@ -15,7 +15,7 @@ with sync_playwright() as p:
     browser = p.chromium.launch(channel="chrome")
     page = browser.new_page(viewport={"width": 1400, "height": 1000}, device_scale_factor=1.5)
     page.goto(URL)
-    page.get_by_text("...or try an example").wait_for(timeout=60000)
+    page.get_by_text("try an example from the held-out test set").wait_for(timeout=60000)
     page.locator("[data-testid='stSelectbox']").click()
     page.get_by_role("option", name=EXAMPLE, exact=True).click()
     page.get_by_text("Top-3 predictions").wait_for(timeout=60000)

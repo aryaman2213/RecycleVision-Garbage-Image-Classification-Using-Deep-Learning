@@ -9,14 +9,14 @@ confidence score, the top-3 predictions, the disposal stream and a **Grad-CAM** 
 <!-- RESULTS:START -->
 ## Results (held-out test set: 2,423 images never used for training or model selection)
 
-| Model | Test accuracy | Macro-F1 [95% CI] | Precision | Recall | Size | CPU latency* |
+| Model | Test accuracy | Macro-F1 [95% CI] | Precision | Recall | Size | CPU compute time* |
 |---|---|---|---|---|---|---|
-| **EfficientNetB0 (deployed)** | **96.5%** | **0.963** [0.955–0.971] | 0.962 | 0.965 | 18 MB | 158 ms |
-| MobileNetV2 | 94.5% | 0.943 [0.933–0.952] | 0.940 | 0.945 | 11 MB | 59 ms |
-| ResNet50 | 93.8% | 0.936 [0.926–0.945] | 0.934 | 0.939 | 97 MB | 171 ms |
-| Baseline CNN (from scratch) | 56.3% | 0.556 [0.534–0.575] | 0.586 | 0.560 | 5 MB | 33 ms |
+| **EfficientNetB0 (deployed)** | **96.5%** | **0.963** [0.955–0.971] | 0.962 | 0.965 | 18 MB | 18 ms |
+| MobileNetV2 | 94.5% | 0.943 [0.933–0.952] | 0.940 | 0.945 | 11 MB | 12 ms |
+| ResNet50 | 93.8% | 0.936 [0.926–0.945] | 0.934 | 0.939 | 97 MB | 38 ms |
+| Baseline CNN (from scratch) | 56.3% | 0.556 [0.534–0.575] | 0.586 | 0.560 | 5 MB | 19 ms |
 
-\*Single image on an Apple M2 CPU. EfficientNetB0 was selected by the highest **validation** macro-F1; McNemar's test
+\*Model compute time for one image on an Apple M2 CPU (benchmark). In the running app, one upload takes about 0.3 s end to end, because the first TensorFlow call of each Streamlit rerun carries a fixed overhead. EfficientNetB0 was selected by the highest **validation** macro-F1; McNemar's test
 shows its advantage over every other model is significant (p < 0.001). Top-3 accuracy is 99.7%; the average
 false-positive rate per class is 0.40%. Full analysis: [`reports/RecycleVision_Report.pdf`](reports/RecycleVision_Report.pdf).
 
@@ -62,7 +62,7 @@ machine (laptop or Colab) is deterministic and size-checked against the exact Ka
 
 1. **Preprocessing.** Images are resized to 224×224 (stored as JPEG). Normalisation happens *inside* each model
    (each backbone's own ImageNet scaling), so the app feeds raw pixels and can never apply the wrong normalisation.
-2. **Augmentation** (training only, inside the model): random horizontal/vertical flips, rotation ±20%, zoom ±20%,
+2. **Augmentation** (training only, inside the model): random horizontal/vertical flips, rotation up to ±72°, zoom ±20%,
    translation ±10%, contrast and brightness ±20%.
 3. **Class imbalance.** Class cap plus balanced class weights in the loss; macro-F1 as the selection metric.
 4. **Models.**
@@ -76,6 +76,23 @@ machine (laptop or Colab) is deterministic and size-checked against the exact Ka
    - Model size, plus single-image CPU latency.
 6. **Model selection** by the highest **validation** macro-F1 (the test set is used only for reporting).
 7. **App:** Streamlit with upload, prediction plus confidence, top-3, disposal advice, Grad-CAM and a model-comparison tab.
+   - Below 80% confidence the app says "not sure". The threshold was chosen on the validation set: it flags about 5% of
+     images, half of all errors are among them, and accuracy on the rest is about 97.5%.
+   - Phone photos are rotated upright (EXIF), and transparent PNGs are placed on white.
+   - Unreadable, corrupt or oversized files get a friendly message instead of a crash.
+
+## Deliverables (from the brief)
+
+| Deliverable | Where |
+|---|---|
+| Cleaned & labelled dataset | `data/manifest.csv` (every image, label, split, fate); the 224×224 images rebuild with `scripts/build_dataset.py` and are also shared as a zip (link below) |
+| Preprocessing pipeline | `src/recyclevision/data.py` (merge, clean, de-duplicate, resize, split); normalisation and augmentation in `src/recyclevision/models.py` |
+| Trained models | `models/`: baseline CNN, MobileNetV2, EfficientNetB0 (deployed), ResNet50 |
+| Model evaluation report | `reports/RecycleVision_Report.pdf`; tables in `reports/metrics/model_comparison.csv`, per-class and confusion CSVs |
+| Streamlit app | `app/streamlit_app.py` (live link: add after deploying) |
+| Documentation | this README, the report, docstrings in every module, `docs/presentation_script.md` |
+
+Dataset zip (224×224, 271 MB): *add the Google Drive link here*
 
 ## Project structure
 
@@ -85,12 +102,12 @@ src/recyclevision/   config.py (single source of truth) · data.py (merge/clean/
 scripts/             prepare_data.py → build_dataset.py → run_eda.py → train_models.py → evaluate_models.py
                      → make_gradcam_gallery.py → build_report.py   (+ make_colab_notebook.py)
 notebooks/           train_colab.ipynb: GPU training on Google Colab
-app/                 streamlit_app.py + examples/ (one held-out test image per class)
-models/              EfficientNetB0 (deployed), MobileNetV2, baseline CNN (.keras) + best_model.json
-                     (ResNet50 is 97 MB, so it is not committed; retrain it with the notebook)
+app/                 streamlit_app.py + examples/ (one held-out test image per class); .streamlit/config.toml
+models/              all four trained models (.keras; EfficientNetB0 is deployed) + best_model.json
 reports/             RecycleVision_Report.pdf, figures/, metrics/ (all tables as CSV/JSON)
 data/manifest.csv    every raw image: source, label, hashes, status (kept/duplicate/…), split
-tests/               pytest: data contract, leakage guard, model I/O, inference
+tests/               pytest (data contract, leakage guard, model I/O, inference) + app_ui_check.py (browser test)
+docs/                presentation_script.md: live-evaluation walkthrough and practice questions
 ```
 
 ## Run it
@@ -100,6 +117,16 @@ python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 streamlit run app/streamlit_app.py
 ```
+
+### Deploy on Streamlit Community Cloud
+
+1. Push this repository to GitHub (public).
+2. On [share.streamlit.io](https://share.streamlit.io), choose **Create app**:
+   - repository `aryaman2213/recyclevision`, branch `main`, main file `app/streamlit_app.py`;
+   - under **Advanced settings**, choose Python **3.12** or **3.13**.
+3. Streamlit installs `requirements.txt` (TensorFlow CPU, about 2 minutes on first boot) and reads
+   `.streamlit/config.toml` (theme, 20 MB upload limit).
+4. Optionally, rebuild the report with the live link: `python scripts/build_report.py --live-url <app-url>`.
 
 ### Reproduce everything
 
@@ -113,7 +140,8 @@ python scripts/train_models.py      # GPU recommended: open notebooks/train_cola
 python scripts/evaluate_models.py   # -> reports/metrics/model_comparison.csv, models/best_model.json
 python scripts/make_gradcam_gallery.py
 python scripts/build_report.py
-pytest -q
+pytest -q                           # data contract, leakage guard, model I/O, inference
+python tests/app_ui_check.py        # with the app running: clicks every control, 10 examples, 10 kinds of upload
 ```
 
 ## Datasets and credits

@@ -1,0 +1,11 @@
+[theme]
+primaryColor = "#16a34a"
+
+[server]
+maxUploadSize = 20  # MB; phone photos are 2-8 MB
+
+[client]
+toolbarMode = "minimal"
+
+[browser]
+gatherUsageStats = false

@@ -16,5 +16,7 @@
   ],
   "img_size": 224,
   "test_accuracy": 0.9645068097399917,
-  "test_f1_macro": 0.9633420027529175
+  "test_f1_macro": 0.9633420027529175,
+  "n_test_images": 2423,
+  "n_dataset_images": 16153
 }

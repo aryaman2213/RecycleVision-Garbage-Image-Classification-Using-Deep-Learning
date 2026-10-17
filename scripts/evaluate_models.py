@@ -31,7 +31,7 @@ def confusion_figure(probs, y, name):
     cm = pd.crosstab(pd.Series(y).map(dict(enumerate(C.CLASSES))), pd.Series(probs.argmax(1)).map(dict(enumerate(C.CLASSES))))
     cm = cm.reindex(index=C.CLASSES, columns=C.CLASSES, fill_value=0)
     cm.to_csv(C.METRICS_DIR / f"confusion_{name}.csv")
-    norm = cm.div(cm.sum(1), axis=0)
+    norm = cm.div(cm.sum(axis=1), axis=0)
     fig, ax = plt.subplots(figsize=(8.5, 7))
     sns.heatmap(norm, annot=cm.values, fmt="d", cmap="Greens", vmin=0, vmax=1, cbar_kws={"label": "row share (recall)"}, ax=ax)
     ax.set(xlabel="Predicted", ylabel="Actual", title=f"{LABELS[name]} - test confusion matrix (counts; colour = row %)")
@@ -123,7 +123,9 @@ def main(skip_latency: bool):
     table.to_csv(C.METRICS_DIR / "model_comparison.csv", index=False)
     meta = {"model": best, "file": f"{best}.keras", "selected_by": "highest validation macro-F1",
             "classes": C.CLASSES, "img_size": C.IMG_SIZE,
-            "test_accuracy": float(table.iloc[0]["accuracy"]), "test_f1_macro": float(table.iloc[0]["f1_macro"])}
+            "test_accuracy": float(table.iloc[0]["accuracy"]), "test_f1_macro": float(table.iloc[0]["f1_macro"]),
+            "n_test_images": int(len(yt)),
+            "n_dataset_images": int(sum(len(split_files(s)[1]) for s in ("train", "val", "test")))}
     (C.MODELS_DIR / "best_model.json").write_text(json.dumps(meta, indent=2))
     comparison_figure(table)
     curves_figure(names)

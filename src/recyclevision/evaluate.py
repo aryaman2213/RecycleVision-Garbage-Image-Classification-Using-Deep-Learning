@@ -72,20 +72,23 @@ def mcnemar(pred_a: np.ndarray, pred_b: np.ndarray, y: np.ndarray) -> dict:
 
 
 def latency_ms(model, runs: int = 30) -> dict:
-    """Single-image latency (what one app upload costs) and batch-32 throughput on this machine."""
+    """Single-image latency (what one app upload costs) and batch-32 throughput on this machine.
+
+    Uses predict_on_batch, the same compiled path as the app (inference.predict).
+    """
     x1 = np.random.default_rng(0).uniform(0, 255, (1, C.IMG_SIZE, C.IMG_SIZE, 3)).astype("float32")
     x32 = np.repeat(x1, 32, axis=0)
     for _ in range(3):
-        model(x1, training=False)
-        model(x32, training=False)
+        model.predict_on_batch(x1)
+        model.predict_on_batch(x32)
     t = []
     for _ in range(runs):
         s = time.perf_counter()
-        model(x1, training=False)
+        model.predict_on_batch(x1)
         t.append((time.perf_counter() - s) * 1000)
     s = time.perf_counter()
     for _ in range(5):
-        model(x32, training=False)
+        model.predict_on_batch(x32)
     per_img = (time.perf_counter() - s) * 1000 / (5 * 32)
     return {"latency_ms_single": float(np.median(t)), "latency_ms_per_image_batch32": float(per_img)}
 

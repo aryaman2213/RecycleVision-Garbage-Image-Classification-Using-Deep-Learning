@@ -1,5 +1,5 @@
 {
-  "latency_ms_single": 157.57029200176476,
-  "latency_ms_per_image_batch32": 25.083387762515486,
+  "latency_ms_single": 17.634958494454622,
+  "latency_ms_per_image_batch32": 11.142418224972062,
   "device": "CPU"
 }

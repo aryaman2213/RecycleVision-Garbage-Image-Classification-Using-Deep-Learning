@@ -46,7 +46,10 @@ def notebook(bundle: bool) -> nbf.NotebookNode:
            "Steps: get the code -> download the 3 Kaggle datasets -> rebuild the exact de-duplicated "
            "dataset from `data/manifest.csv` -> train 4 models -> evaluate -> zip results. "
            "Trained models are written straight to Google Drive, so after a disconnect just Run all again: "
-           "finished models are skipped."),
+           "finished models are skipped.\n\n"
+           "**Note:** the repository already contains the trained models and results from the original run. "
+           "Running this notebook retrains everything from scratch (about 1.5 h on a free T4). Afterwards, run "
+           "`scripts/evaluate_models.py` once more on a CPU machine to measure CPU latency (Colab measures GPU)."),
         code("!nvidia-smi -L\nimport tensorflow as tf, keras, sys\n"
              "print(sys.version.split()[0], 'TF', tf.__version__, 'Keras', keras.__version__, tf.config.list_physical_devices('GPU'))"),
         md("## 1. Code and manifest"),
@@ -60,7 +63,7 @@ def notebook(bundle: bool) -> nbf.NotebookNode:
              "!mkdir -p {OUT}/models {OUT}/reports && rm -rf models reports && ln -s {OUT}/models models && ln -s {OUT}/reports reports\n"
              "!ls -l models/ reports/"),
         md("## 4. Train (one cell per model, so progress is visible and resumable)"),
-        *[code(f"!python scripts/train_models.py --models {n}") for n in C.MODEL_NAMES],
+        *[code(f"!python scripts/train_models.py --models {n}") for n in C.TRAIN_ORDER],
         md("## 5. Evaluate on the held-out test set"),
         code("!python scripts/evaluate_models.py"),
         md("## 6. Download everything"),

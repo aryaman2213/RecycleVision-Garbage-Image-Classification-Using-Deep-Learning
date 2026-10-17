@@ -53,6 +53,25 @@ def test_models_build_with_expected_io(name):
     assert np.isclose(probs.sum(), 1, atol=1e-4)
 
 
+def test_transparent_png_is_put_on_white_and_exif_rotation_applied():
+    from PIL import Image
+
+    from recyclevision.inference import to_rgb
+
+    rgba = Image.new("RGBA", (40, 20), (0, 0, 0, 0))
+    assert to_rgb(rgba).getpixel((5, 5)) == (255, 255, 255)
+    sideways = Image.new("RGB", (20, 40))
+    exif = Image.Exif()
+    exif[0x0112] = 6  # "rotate 90 CW" tag written by phones
+    sideways.info["exif"] = exif.tobytes()
+    sideways.getexif()[0x0112] = 6
+    assert to_rgb(sideways).size == (40, 20)
+
+
+def test_confidence_threshold_is_sane():
+    assert 0.5 <= C.CONFIDENCE_THRESHOLD < 1
+
+
 def test_preprocess_handles_any_image_mode():
     from PIL import Image
 

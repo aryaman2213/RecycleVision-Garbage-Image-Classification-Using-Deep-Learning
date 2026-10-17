@@ -92,7 +92,14 @@ THUMB_MIN_NCC = 0.95   # ...confirmed only if 32x32 colour thumbnails correlate 
 # Class cap: clothes alone is ~1/3 of the merged data; capping keeps accuracy honest.
 CLASS_CAP = 2500
 
+# App: below this top-class probability the app says "not sure" instead of asserting a class.
+# Chosen on the validation set (scripts/build_report.py reports the trade-off): at 0.80 about 5% of images
+# are flagged, half of all errors are among them, and accuracy on the rest rises to ~97.5%.
+CONFIDENCE_THRESHOLD = 0.80
+
 # Training
 BATCH_SIZE = 32
 SMOKE_LIMIT = int(os.environ.get("RECYCLEVISION_SMOKE", "0"))  # >0: use N images per class (tests only)
 MODEL_NAMES = ["baseline_cnn", "mobilenetv2", "efficientnetb0", "resnet50"]
+# Transfer models first: if a free Colab session ends early, the important models are already saved.
+TRAIN_ORDER = ["mobilenetv2", "efficientnetb0", "resnet50", "baseline_cnn"]
