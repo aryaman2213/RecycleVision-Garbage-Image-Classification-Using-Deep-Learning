@@ -1,0 +1,13 @@
+{
+  "model": "efficientnetb0",
+  "train_seconds": 888.1,
+  "frozen_epochs": 8,
+  "finetune_epochs": 15,
+  "finetuned_backbone_layers": 85,
+  "backbone_layers": 239,
+  "params": 4380077,
+  "device": "/physical_device:GPU:0",
+  "tensorflow": "2.21.0",
+  "keras": "3.13.2",
+  "export_max_prob_diff": 0.02380797266960144
+}

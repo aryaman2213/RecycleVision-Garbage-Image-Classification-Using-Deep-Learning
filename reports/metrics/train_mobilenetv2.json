@@ -1,0 +1,13 @@
+{
+  "model": "mobilenetv2",
+  "train_seconds": 650.7,
+  "frozen_epochs": 8,
+  "finetune_epochs": 15,
+  "finetuned_backbone_layers": 47,
+  "backbone_layers": 156,
+  "params": 2588490,
+  "device": "/physical_device:GPU:0",
+  "tensorflow": "2.21.0",
+  "keras": "3.13.2",
+  "export_max_prob_diff": 0.003925979137420654
+}

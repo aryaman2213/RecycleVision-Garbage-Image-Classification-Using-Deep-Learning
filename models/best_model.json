@@ -1,0 +1,20 @@
+{
+  "model": "efficientnetb0",
+  "file": "efficientnetb0.keras",
+  "selected_by": "highest validation macro-F1",
+  "classes": [
+    "battery",
+    "cardboard",
+    "clothes",
+    "glass",
+    "metal",
+    "organic",
+    "paper",
+    "plastic",
+    "shoes",
+    "trash"
+  ],
+  "img_size": 224,
+  "test_accuracy": 0.9645068097399917,
+  "test_f1_macro": 0.9633420027529175
+}

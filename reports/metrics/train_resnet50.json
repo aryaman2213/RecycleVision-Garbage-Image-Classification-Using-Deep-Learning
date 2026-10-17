@@ -1,0 +1,13 @@
+{
+  "model": "resnet50",
+  "train_seconds": 886.7,
+  "frozen_epochs": 8,
+  "finetune_epochs": 10,
+  "finetuned_backbone_layers": 43,
+  "backbone_layers": 177,
+  "params": 24114826,
+  "device": "/physical_device:GPU:0",
+  "tensorflow": "2.21.0",
+  "keras": "3.13.2",
+  "export_max_prob_diff": 0.00032270699739456177
+}

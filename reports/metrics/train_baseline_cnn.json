@@ -1,0 +1,10 @@
+{
+  "model": "baseline_cnn",
+  "train_seconds": 1937.6,
+  "scratch_epochs": 25,
+  "params": 1243498,
+  "device": "/physical_device:GPU:0",
+  "tensorflow": "2.21.0",
+  "keras": "3.13.2",
+  "export_max_prob_diff": 7.987022399902344e-05
+}

@@ -1,0 +1,125 @@
+{
+  "raw_images": 30301,
+  "final_images": 16153,
+  "status_by_source": {
+    "capped": {
+      "gc12": 2855,
+      "gd10": 21,
+      "tn6": 13
+    },
+    "duplicate": {
+      "gc12": 2460,
+      "gd10": 8745,
+      "tn6": 27
+    },
+    "invalid_blank": {
+      "gc12": 4,
+      "gd10": 1,
+      "tn6": 0
+    },
+    "invalid_too_small": {
+      "gc12": 1,
+      "gd10": 1,
+      "tn6": 0
+    },
+    "kept": {
+      "gc12": 10187,
+      "gd10": 3487,
+      "tn6": 2479
+    },
+    "label_conflict": {
+      "gc12": 8,
+      "gd10": 4,
+      "tn6": 8
+    }
+  },
+  "final_per_class": {
+    "battery": 934,
+    "cardboard": 1580,
+    "clothes": 2500,
+    "glass": 2500,
+    "metal": 1079,
+    "organic": 1036,
+    "paper": 1757,
+    "plastic": 1820,
+    "shoes": 1957,
+    "trash": 990
+  },
+  "imbalance_ratio_max_min": 2.68,
+  "split_sizes": {
+    "train": 11307,
+    "test": 2423,
+    "val": 2423
+  },
+  "original_width_px": {
+    "min": 68.0,
+    "50%": 328.0,
+    "max": 7786.0
+  },
+  "original_height_px": {
+    "min": 71.0,
+    "50%": 304.0,
+    "max": 6283.0
+  },
+  "mean_rgb_per_class": {
+    "battery": {
+      "mean_r": 189.6,
+      "mean_g": 189.0,
+      "mean_b": 187.4
+    },
+    "cardboard": {
+      "mean_r": 187.3,
+      "mean_g": 174.3,
+      "mean_b": 157.1
+    },
+    "clothes": {
+      "mean_r": 140.5,
+      "mean_g": 121.5,
+      "mean_b": 116.8
+    },
+    "glass": {
+      "mean_r": 179.6,
+      "mean_g": 177.8,
+      "mean_b": 165.7
+    },
+    "metal": {
+      "mean_r": 170.9,
+      "mean_g": 164.5,
+      "mean_b": 159.7
+    },
+    "organic": {
+      "mean_r": 163.9,
+      "mean_g": 139.9,
+      "mean_b": 111.5
+    },
+    "paper": {
+      "mean_r": 168.1,
+      "mean_g": 159.3,
+      "mean_b": 150.2
+    },
+    "plastic": {
+      "mean_r": 160.2,
+      "mean_g": 160.7,
+      "mean_b": 159.2
+    },
+    "shoes": {
+      "mean_r": 171.0,
+      "mean_g": 162.2,
+      "mean_b": 155.2
+    },
+    "trash": {
+      "mean_r": 194.1,
+      "mean_g": 196.1,
+      "mean_b": 193.0
+    }
+  },
+  "duplicates_removed": 11232,
+  "duplicates_by_pair": {
+    "gc12->gc12": 110,
+    "gc12->tn6": 2350,
+    "gd10->gc12": 6480,
+    "gd10->gd10": 19,
+    "gd10->tn6": 2246,
+    "tn6->tn6": 27
+  }
+}

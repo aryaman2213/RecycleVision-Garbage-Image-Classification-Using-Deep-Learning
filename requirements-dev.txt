@@ -1,0 +1,8 @@
+# Everything needed to rebuild the dataset, train, evaluate and build the report.
+-r requirements.txt
+scipy
+scikit-learn==1.7.2
+seaborn==0.13.2
+reportlab
+nbformat
+pytest

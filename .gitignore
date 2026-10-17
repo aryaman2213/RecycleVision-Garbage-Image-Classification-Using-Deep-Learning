@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+data/raw/
+data/processed/
+data/features.pkl
+notebooks/_colab_bundle.ipynb
+notebooks/_bundle.tar.gz
+models/resnet50.keras
+.pytest_cache/
+.claude/

@@ -1,0 +1,11 @@
+row_0,battery,cardboard,clothes,glass,metal,organic,paper,plastic,shoes,trash
+battery,85,10,8,1,12,0,12,2,10,0
+cardboard,5,179,3,10,5,0,29,2,4,0
+clothes,1,19,214,5,20,19,41,26,15,15
+glass,3,38,1,213,39,9,26,16,27,3
+metal,4,7,1,28,95,0,20,6,1,0
+organic,0,10,2,5,15,97,17,4,4,2
+paper,1,20,8,18,7,1,193,13,2,0
+plastic,1,29,9,25,32,2,46,114,1,14
+shoes,18,11,26,24,32,6,33,4,131,8
+trash,2,11,3,29,7,0,33,17,3,44
