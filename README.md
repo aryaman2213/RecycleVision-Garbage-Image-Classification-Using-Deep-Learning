@@ -1,8 +1,29 @@
-# ♻️ RecycleVision — Garbage Image Classification Using Deep Learning
+# ♻️ RecycleVision: Garbage Image Classification Using Deep Learning
 
-Upload a photo of a waste item and RecycleVision classifies it into one of **10 categories**:
-battery, cardboard, clothes, glass, metal, organic, paper, plastic, shoes and trash. It returns a
-confidence score, the top-3 predictions, the disposal stream and a **Grad-CAM** heatmap showing what the model looked at.
+<!-- LIVE-BADGE -->
+![Python](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)
+![TensorFlow](https://img.shields.io/badge/TensorFlow-2.21-FF6F00?logo=tensorflow&logoColor=white)
+![Keras](https://img.shields.io/badge/Keras-3.15-D00000?logo=keras&logoColor=white)
+![Streamlit](https://img.shields.io/badge/Streamlit-1.66-FF4B4B?logo=streamlit&logoColor=white)
+![Tests](https://img.shields.io/badge/tests-13%20unit%20%2B%2055%20UI%20checks-brightgreen)
+![License](https://img.shields.io/badge/License-MIT-blue)
+
+**Sort waste from a photo.** Upload a picture of a single waste item and RecycleVision classifies it into one of
+**10 categories**: battery, cardboard, clothes, glass, metal, organic, paper, plastic, shoes and trash. It shows a
+confidence score, the top-3 predictions, the disposal stream and a **Grad-CAM** heatmap of what the model looked at.
+
+| | |
+|---|---|
+| **Best model** | EfficientNetB0 (transfer learning, fine-tuned), selected on validation macro-F1 |
+| **Test set** | **96.5% accuracy**, macro-F1 **0.963**, precision 0.962 / recall 0.965, on 2,423 held-out images |
+| **Data** | 3 Kaggle datasets merged into **16,153 unique images**; 11,232 cross-dataset duplicates removed |
+| **Deployment** | 18 MB model, ~18 ms compute per image on a laptop CPU, Streamlit app |
+
+- **Report:** [`reports/RecycleVision_Report.pdf`](reports/RecycleVision_Report.pdf): data, EDA, models, error analysis, Grad-CAM
+- **Live app:** <!-- LIVE-URL --> run locally with `streamlit run app/streamlit_app.py` (see below)
+- **Training notebook:** [`notebooks/train_colab.ipynb`](notebooks/train_colab.ipynb): free Colab T4 GPU, about 1.5 h
+
+![RecycleVision app: prediction, top-3, disposal advice and Grad-CAM](reports/figures/readme_preview.png)
 
 **Domain:** waste management, environmental tech, computer vision · **Stack:** Python, TensorFlow/Keras, Streamlit
 
@@ -122,7 +143,7 @@ streamlit run app/streamlit_app.py
 
 1. Push this repository to GitHub (public).
 2. On [share.streamlit.io](https://share.streamlit.io), choose **Create app**:
-   - repository `aryaman2213/recyclevision`, branch `main`, main file `app/streamlit_app.py`;
+   - repository `aryaman2213/RecycleVision-Garbage-Image-Classification-Using-Deep-Learning`, branch `main`, main file `app/streamlit_app.py`;
    - under **Advanced settings**, choose Python **3.12** or **3.13**.
 3. Streamlit installs `requirements.txt` (TensorFlow CPU, about 2 minutes on first boot) and reads
    `.streamlit/config.toml` (theme, 20 MB upload limit).
@@ -144,6 +165,7 @@ pytest -q                           # data contract, leakage guard, model I/O, i
 python tests/app_ui_check.py        # with the app running: clicks every control, 10 examples, 10 kinds of upload
 ```
 
-## Datasets and credits
+## Datasets, credits and license
 
-The datasets are by their Kaggle authors (linked above). This project was built as a GUVI × HCL capstone.
+The images belong to their Kaggle authors (linked above) and keep their original terms. The code in this repository is
+released under the [MIT License](LICENSE). Built by **Aryaman Bhatnagar** as a GUVI × HCL deep learning capstone.

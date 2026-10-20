@@ -25,7 +25,7 @@ from recyclevision import config as C  # noqa: E402
 
 PDF_PATH = C.REPORTS_DIR / "RecycleVision_Report.pdf"
 AUTHOR = "Aryaman Bhatnagar"
-GITHUB_URL = "https://github.com/aryaman2213/recyclevision"
+GITHUB_URL = "https://github.com/aryaman2213/RecycleVision-Garbage-Image-Classification-Using-Deep-Learning"
 LABELS = {"baseline_cnn": "Baseline CNN", "mobilenetv2": "MobileNetV2",
           "efficientnetb0": "EfficientNetB0", "resnet50": "ResNet50"}
 

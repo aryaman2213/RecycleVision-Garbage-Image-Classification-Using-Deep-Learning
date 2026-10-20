@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from recyclevision import config as C  # noqa: E402
 
-REPO = "https://github.com/aryaman2213/recyclevision.git"
+REPO = "https://github.com/aryaman2213/RecycleVision-Garbage-Image-Classification-Using-Deep-Learning.git"
 
 
 def bundle_b64() -> str:
