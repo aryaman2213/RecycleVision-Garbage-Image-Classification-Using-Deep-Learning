@@ -1,6 +1,6 @@
 # ♻️ RecycleVision: Garbage Image Classification Using Deep Learning
 
-<!-- LIVE-BADGE -->
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://recycle-vision.streamlit.app)
 ![Python](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)
 ![TensorFlow](https://img.shields.io/badge/TensorFlow-2.21-FF6F00?logo=tensorflow&logoColor=white)
 ![Keras](https://img.shields.io/badge/Keras-3.15-D00000?logo=keras&logoColor=white)
@@ -20,7 +20,7 @@ confidence score, the top-3 predictions, the disposal stream and a **Grad-CAM** 
 | **Deployment** | 18 MB model, ~18 ms compute per image on a laptop CPU, Streamlit app |
 
 - **Report:** [`reports/RecycleVision_Report.pdf`](reports/RecycleVision_Report.pdf): data, EDA, models, error analysis, Grad-CAM
-- **Live app:** <!-- LIVE-URL --> run locally with `streamlit run app/streamlit_app.py` (see below)
+- **Live app:** https://recycle-vision.streamlit.app
 - **Training notebook:** [`notebooks/train_colab.ipynb`](notebooks/train_colab.ipynb): free Colab T4 GPU, about 1.5 h
 
 ![RecycleVision app: prediction, top-3, disposal advice and Grad-CAM](reports/figures/readme_preview.png)
@@ -106,14 +106,14 @@ machine (laptop or Colab) is deterministic and size-checked against the exact Ka
 
 | Deliverable | Where |
 |---|---|
-| Cleaned & labelled dataset | `data/manifest.csv` (every image, label, split, fate); the 224×224 images rebuild with `scripts/build_dataset.py` and are also shared as a zip (link below) |
+| Cleaned & labelled dataset | `data/manifest.csv` (every image, label, split, fate); the 224×224 images rebuild with `scripts/build_dataset.py` and are also shared as a [zip on Google Drive](https://drive.google.com/file/d/15jv4JEl9eO8PFhQhNrVC8m7b99ohwn-z/view?usp=sharing) |
 | Preprocessing pipeline | `src/recyclevision/data.py` (merge, clean, de-duplicate, resize, split); normalisation and augmentation in `src/recyclevision/models.py` |
 | Trained models | `models/`: baseline CNN, MobileNetV2, EfficientNetB0 (deployed), ResNet50 |
 | Model evaluation report | `reports/RecycleVision_Report.pdf`; tables in `reports/metrics/model_comparison.csv`, per-class and confusion CSVs |
-| Streamlit app | `app/streamlit_app.py` (live link: add after deploying) |
+| Streamlit app | `app/streamlit_app.py`, live at https://recycle-vision.streamlit.app |
 | Documentation | this README, the report, docstrings in every module, `docs/presentation_script.md` |
 
-Dataset zip (224×224, 271 MB): *add the Google Drive link here*
+Dataset zip (224×224 JPEGs + `labels.csv`, 271 MB): [Google Drive](https://drive.google.com/file/d/15jv4JEl9eO8PFhQhNrVC8m7b99ohwn-z/view?usp=sharing)
 
 ## Project structure
 

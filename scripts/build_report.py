@@ -334,7 +334,7 @@ Without de-duplication, copies of test photos would have been in the training se
 <h2>10. Brief requirements checklist</h2>
 <table><thead><tr><th>Requirement</th><th>Where</th></tr></thead><tbody>
 <tr><td>Dataset from the brief (Kaggle)</td><td>All three linked datasets, merged and de-duplicated (Section 2)</td></tr>
-<tr><td>Cleaned &amp; labelled dataset (deliverable)</td><td><code>data/manifest.csv</code> + 224×224 image set (rebuilt by <code>scripts/build_dataset.py</code>; shared as a zip)</td></tr>
+<tr><td>Cleaned &amp; labelled dataset (deliverable)</td><td><code>data/manifest.csv</code> + 224×224 image set (rebuilt by <code>scripts/build_dataset.py</code>; <a href="https://drive.google.com/file/d/15jv4JEl9eO8PFhQhNrVC8m7b99ohwn-z/view?usp=sharing">zip on Google Drive</a>)</td></tr>
 <tr><td>Resize 224×224, normalise, augment, handle imbalance</td><td>Sections 2 and 4; <code>data.py</code>, <code>models.py</code></td></tr>
 <tr><td>EDA: class counts, samples, colour distribution</td><td>Section 3; <code>scripts/run_eda.py</code></td></tr>
 <tr><td>Baseline CNN + transfer learning (MobileNetV2, EfficientNetB0, ResNet50)</td><td>Sections 4–5; <code>models.py</code></td></tr>

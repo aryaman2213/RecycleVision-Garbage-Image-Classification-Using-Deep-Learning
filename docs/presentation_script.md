@@ -13,7 +13,9 @@ It is scored out of 60: code quality, documentation, modularity, presentation, t
 questions are worth 10 each. The explanation below follows GUVI's **"Model Building Projects"** template, in order.
 Keep each point to 1–2 lines and always say *why*.
 
-**Have open on screen:** the live app, the GitHub README, and `reports/RecycleVision_Report.pdf`.
+**Have open on screen:** the live app (https://recycle-vision.streamlit.app), the GitHub README
+(https://github.com/aryaman2213/RecycleVision-Garbage-Image-Classification-Using-Deep-Learning), and
+`reports/RecycleVision_Report.pdf`. Open the app a few minutes before the evaluation, so it is awake.
 
 ---
 

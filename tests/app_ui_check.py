@@ -15,6 +15,8 @@ from playwright.sync_api import expect, sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
 URL = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:8531"
+# A remote server (Streamlit Cloud: pass https://<app>.streamlit.app/~/+/) needs longer before a rerun starts.
+SETTLE_MS = 400 if "localhost" in URL else 2500
 EX = ROOT / "app" / "examples"
 CLASSES = sorted(p.stem for p in EX.glob("*.jpg"))
 failures = []
@@ -53,7 +55,7 @@ def no_exception(page, where):
 
 def wait_idle(page):
     """Wait until Streamlit has finished the rerun and no stale (previous-run) elements remain."""
-    page.wait_for_timeout(400)
+    page.wait_for_timeout(SETTLE_MS)
     page.wait_for_function(
         "() => !document.querySelector('[data-testid=\"stStatusWidget\"]') &&"
         " !document.querySelector('[data-stale=\"true\"]')", timeout=90000)
@@ -70,7 +72,7 @@ with sync_playwright() as pw, tempfile.TemporaryDirectory() as tmp:
     page = browser.new_page(viewport={"width": 1400, "height": 1000})
     console_errors = []
     page.on("console", lambda m: console_errors.append(m.text) if m.type == "error" else None)
-    page.goto(URL)
+    page.goto(URL, timeout=120000)
     page.get_by_text("try an example from the held-out test set").wait_for(timeout=120000)
 
     # --- sidebar facts come from best_model.json
@@ -145,7 +147,7 @@ with sync_playwright() as pw, tempfile.TemporaryDirectory() as tmp:
 
     # --- phone-width layout: no horizontal scroll
     phone = browser.new_page(viewport={"width": 390, "height": 844}, is_mobile=True)
-    phone.goto(URL)
+    phone.goto(URL, timeout=120000)
     phone.get_by_text("try an example from the held-out test set").wait_for(timeout=60000)
     phone.locator("[data-testid='stSelectbox']").click()
     phone.get_by_role("option", name="plastic", exact=True).click()
